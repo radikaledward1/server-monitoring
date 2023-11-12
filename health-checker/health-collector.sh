@@ -13,8 +13,15 @@ IPV4=$(hostname -I | awk '{print $1}')
 
 # Disk Space
 disk_info=$(df -h / | awk 'NR==2{print $2, $3, $4, $5}')
-
 read dtotal dused dfree dpercent <<< $disk_info
+numeric_percentage=$(echo "$dpercent" | tr -d '%')
+
+if [ "$numeric_percentage" -ge 80 ]; then
+    disk_msg="Disk: Total: $dtotal, Used: $dused, Free: $dfree, Use: $dpercent. - ISSUED"
+else
+    disk_msg="Disk: Total: $dtotal, Used: $dused, Free: $dfree, Use: $dpercent. - OK"
+fi
+
 
 #TOTALD=$(echo "$disk_info" | awk '{ print $1}')
 #USED=$(echo "$disk_info" | awk '{ print $2}')
@@ -31,8 +38,8 @@ read dtotal dused dfree dpercent <<< $disk_info
 
 # Memory
 mem_info=$(free -g | awk 'NR==2{print $2, $3, $4, $6, $7}')
-
 read mtotal mused mfree mcache mavailable <<< $mem_info
+memory_msg="Memory: Total: $mtotal GB, Used: $mused GB, Free: $mfree GB, Cache: $mcache GB, Available: $mavailable GB."
 
 #echo "Memory Status"
 #echo "Total: $mtotal MB, Used: $mused MB, Available: $mfree MB, Use: $mpercent%"
@@ -79,6 +86,12 @@ else
     APACHE_MEMORY="Not Available"
 fi
 
+if [ "$APACHE_STATUS" == "Running" ]; then
+    apache_msg="Apache: $APACHE_STATUS, Memory: $APACHE_MEMORY. - OK"
+else
+    apache_msg="Apache: $APACHE_STATUS, Memory: $APACHE_MEMORY. - ISSUED"
+fi
+
 # MySQL
 
 MYSQL_STATUS=''
@@ -118,11 +131,20 @@ else
     MYSQL_MEMORY="Not Available"
 fi
 
+if [ "$MYSQL_STATUS" == "Running" ]; then
+    mysql_msg="MySQL: $MYSQL_STATUS, Memory: $MYSQL_MEMORY. - OK"
+else
+    mysql_msg="MySQL: $MYSQL_STATUS, Memory: $MYSQL_MEMORY. - ISSUED"
+fi
+
 status="\nHost: $HOST\n
 IP: $IPV4\n
-Disk: Total: $dtotal, Used: $dused, Free: $dfree, Use: $dpercent\n
-Memory: Total: $mtotal GB, Used: $mused GB, Free: $mfree GB, Cache: $mcache GB, Available: $mavailable GB\n
-Apache: $APACHE_STATUS, Memory: $APACHE_MEMORY\n
-MySQL: $MYSQL_STATUS, Memory: $MYSQL_MEMORY\n"
+$disk_msg\n
+$memory_msg\n
+$apache_msg\n
+$mysql_msg\n
+\n
+====================================\n
+\n"
 
 echo -e $status
