@@ -58,10 +58,15 @@ servercheck () {
 websitecheck () {
   local res=$1
   # 1 means false (no error), 2 means true (error)
-  # curl -s --head  --request GET "$1" | grep "200 OK" > /dev/null;
-  if curl -s --head  --request GET "$2" > /dev/null; then 
-    echo "${GREEN}SUCCESS${NC}: The website $2 is up running."
-    eval $res=1   
+  if curl -s --head  --request GET "$2" > /dev/null; then
+    http_code=$(curl -s -o /dev/null -w "%{http_code}" "$2")
+    if [ "$http_code" -eq 200 ] || [ "$http_code" -eq 301 ]; then
+      echo "${GREEN}SUCCESS${NC}: The website $2 is up running."
+      eval $res=1
+    else
+      echo "${YELLOW}WARNING${NC}: The website $2 is down."
+      eval $res=2
+    fi
   else
     echo "${YELLOW}WARNING${NC}: The website $2 is down."
     eval $res=2
