@@ -34,8 +34,8 @@ readarray() {
 }
 
 countdomains () {
-  #Count how many domains are listed in the file domains.txt
-  local DOMAINS=$(wc -l domains.txt | awk '{print $1}')
+  # Count how many domains are listed in the file domains.txt
+  local DOMAINS=$(awk 'END {print NR}' domains.txt)
   echo "$DOMAINS"
 }
 
