@@ -97,7 +97,7 @@ echo "\n"
 #     echo "Bye Bye!"
 # done
 
-while IFS=" " read -r ip domain; do
+while IFS=" " read -r ip domain || [[ -n "$ip" ]] || [[ -n "$domain" ]]; do
     
     remote_server_ip="$ip"
     remote_server_domain="$domain"

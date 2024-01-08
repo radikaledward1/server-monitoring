@@ -22,7 +22,7 @@ readarray() {
   local __resultvar=$1
   declare -a __local_array
   let i=0
-  while IFS=$'\n' read -r line_data; do
+  while IFS=$'\n' read -r line_data || [[ -n "$line_data" ]]; do
       __local_array[i]=${line_data}
       ((++i))
   done < $2
@@ -108,41 +108,42 @@ reportmessages () {
 
 # Retrive the list of domains from the file domains.txt
 readarray DOMAINS domains.txt
+echo $DOMAINS
 
 # Make the request calls for each domain listed in the file domains.txt and check the server and website availability
-for DOMAIN in $DOMAINS
-do
-  echo "\n"
+# for DOMAIN in $DOMAINS
+# do
+#   echo "\n"
 
-  servercheck SCHECK $DOMAIN
-  websitecheck WCHECK $DOMAIN
+#   servercheck SCHECK $DOMAIN
+#   websitecheck WCHECK $DOMAIN
 
-  reportmessages $SCHECK $WCHECK $DOMAIN
-done
+#   reportmessages $SCHECK $WCHECK $DOMAIN
+# done
 
-#Creates the report file
-if [ -f report.txt ]; then
-  rm report.txt
-fi
+# #Creates the report file
+# if [ -f report.txt ]; then
+#   rm report.txt
+# fi
 
-cat << EOF >> report.txt
-DOMAINS CHECKER REPORT
+# cat << EOF >> report.txt
+# DOMAINS CHECKER REPORT
 
-=======================================================================
-The followed is a report after checked the list of domains listed in
-'domains.txt' file for server and website availability.
-=======================================================================
+# =======================================================================
+# The followed is a report after checked the list of domains listed in
+# 'domains.txt' file for server and website availability.
+# =======================================================================
 
 
-EOF
+# EOF
 
-numdomains=$(countdomains)
-echo "Domains: $numdomains" >> report.txt
-echo "Successed: $SUCCESSED" >> report.txt
-echo "Issued: $ISSUED" >> report.txt
-echo "\n" >> report.txt
+# numdomains=$(countdomains)
+# echo "Domains: $numdomains" >> report.txt
+# echo "Successed: $SUCCESSED" >> report.txt
+# echo "Issued: $ISSUED" >> report.txt
+# echo "\n" >> report.txt
 
-for STATUS in "${STATUSES[@]}"
-do
-  echo "$STATUS" >> report.txt
-done
+# for STATUS in "${STATUSES[@]}"
+# do
+#   echo "$STATUS" >> report.txt
+# done
